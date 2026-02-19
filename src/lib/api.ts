@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://desktop-sgloo1r.tail972c67.ts.net/api/v1';
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL
 const API_KEY = process.env.NEXT_PUBLIC_API_KEY || '5f3678a3-4f5e-6d7e-8f9a-1b2c3d4e5f6g'; // Default for now if .env fails
 
 export async function apiRequest(endpoint: string, options: any = {}) {
