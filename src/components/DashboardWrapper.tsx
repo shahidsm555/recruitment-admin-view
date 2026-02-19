@@ -21,9 +21,9 @@ export default function DashboardWrapper() {
 
     useEffect(() => {
         if (mounted) {
-            if (userRole === "SUPER_USER") {
+            if (userRole === "superuser") {
                 router.push("/super/dashboard");
-            } else if (userRole === "SYSTEM_ADMIN") {
+            } else if (userRole === "system_administrator") {
                 router.push("/admin/dashboard");
             }
         }

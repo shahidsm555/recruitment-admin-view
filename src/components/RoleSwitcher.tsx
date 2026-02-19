@@ -13,9 +13,9 @@ export default function RoleSwitcher() {
         setUserRole(newRole);
 
         // Redirect based on role
-        if (newRole === 'SUPER_USER') {
+        if (newRole === 'superuser') {
             router.push('/super/dashboard');
-        } else if (newRole === 'SYSTEM_ADMIN') {
+        } else if (newRole === 'system_administrator') {
             router.push('/admin/dashboard');
         } else {
             router.push('/');

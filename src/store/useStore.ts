@@ -82,13 +82,17 @@ export const useStore = create<StoreState>()(
       authError: null,
 
       setAuth: (data) => {
-        localStorage.setItem('access_token', data.auth.access_token);
+        if (!data || !data.user) {
+          console.error('Invalid auth data structure:', data);
+          return;
+        }
+        // localStorage.setItem('access_token', data.auth.access_token);
         set({
           user: data.user,
-          accessControl: data.access_control,
+          accessControl: data.access_control || null,
           isAuthenticated: true,
-          userRole: data.user.role.name,
-          accessToken: data.auth.access_token,
+          userRole: data.user.role?.name || 'USER',
+          accessToken: data.auth?.access_token || null,
         });
       },
 
@@ -115,9 +119,10 @@ export const useStore = create<StoreState>()(
             method: 'POST',
             body: JSON.stringify(credentials),
           });
+          console.log('Login response received:', data);
           get().setAuth(data);
         } catch (error: any) {
-          console.error('Login failed:', error);
+          console.error('Login failed with error:', error);
           set({ authError: error.message || 'Invalid email or password' });
           throw error;
         } finally {

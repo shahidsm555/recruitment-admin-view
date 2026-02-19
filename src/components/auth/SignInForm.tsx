@@ -30,9 +30,9 @@ export default function SignInForm() {
       } else if (user?.role.name === 'superuser') {
         router.push('/super/dashboard');
       }
-      else {
-        router.push('/dashboard');
-      }
+      // else {
+      //   router.push('/dashboard');
+      // }
     } catch (err: any) {
       // Error is handled in the store
     }
