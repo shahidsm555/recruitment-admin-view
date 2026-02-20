@@ -97,7 +97,7 @@ export const useStore = create<StoreState>()(
       },
 
       clearAuth: () => {
-        localStorage.removeItem('access_token');
+        // We rely on cookies now, so we don't need to manually clear localStorage for the token
         set({
           user: null,
           accessControl: null,
@@ -120,7 +120,14 @@ export const useStore = create<StoreState>()(
             body: JSON.stringify(credentials),
           });
           console.log('Login response received:', data);
-          get().setAuth(data);
+
+          // If login response is empty, fetch current user data immediately
+          if (!data || !data.user) {
+            console.log('Login response empty, fetching user info...');
+            await get().fetchCurrentUser();
+          } else {
+            get().setAuth(data);
+          }
         } catch (error: any) {
           console.error('Login failed with error:', error);
           set({ authError: error.message || 'Invalid email or password' });
@@ -134,12 +141,20 @@ export const useStore = create<StoreState>()(
         set({ authLoading: true, authError: null });
         try {
           const data = await apiRequest('auth/me');
-          // Assuming auth/me returns user info that matches our User interface partially
-          // The request example shows: { user_id, email, full_name, role_id, is_active }
-          // We might need to adjust this based on the actual response format
-          const roleName = data.role_id === 'e75c3738-c90a-4606-8782-278aff1ce091' ? 'system_administrator' : 'USER';
+          // Try to get role name from data.role object if it exists
+          let roleName = data.role?.name;
+
+          // Fallback to legacy check if name is not present
+          if (!roleName) {
+            roleName = data.role_id === 'e75c3738-c90a-4606-8782-278aff1ce091' ? 'system_administrator' : 'USER';
+          }
+
           set((state) => ({
-            user: { ...state.user, ...data, role: { ...state.user?.role, name: roleName } } as User,
+            user: {
+              ...state.user,
+              ...data,
+              role: data.role || { ...state.user?.role, name: roleName }
+            } as User,
             isAuthenticated: true,
             userRole: roleName,
           }));

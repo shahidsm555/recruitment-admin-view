@@ -2,6 +2,7 @@
 import { useStore } from "@/store/useStore";
 import { useRouter, usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
+// import Cookies from "js-cookie";
 
 export default function AuthGuard({ children }: { children: React.ReactNode }) {
     const { isAuthenticated, fetchCurrentUser, clearAuth } = useStore();
@@ -11,21 +12,18 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
 
     useEffect(() => {
         const checkAuth = async () => {
-            const token = localStorage.getItem('access_token');
-            if (!token) {
-                clearAuth();
-                if (pathname !== '/signin') {
-                    router.push('/signin');
-                }
-                setIsLoading(false);
-                return;
-            }
+            // Since access_token might be HttpOnly, we can't reliably check document.cookie
+            // Instead, we try to fetch the current user. If it fails, we assume unauthenticated.
 
             if (!isAuthenticated) {
                 try {
                     await fetchCurrentUser();
                 } catch (error) {
-                    router.push('/signin');
+                    // Only redirect if we are not already on a public page
+                    if (pathname !== '/signin' && pathname !== '/signup') {
+                        router.push('/signin');
+                    }
+                    setIsLoading(false);
                     return;
                 }
             }
@@ -34,8 +32,14 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
             const state = useStore.getState();
             const user = state.user;
 
+            if (!state.isAuthenticated && pathname !== '/signin' && pathname !== '/signup') {
+                router.push('/signin');
+                setIsLoading(false);
+                return;
+            }
+
             if (user) {
-                const role = user.role.name;
+                const role = user.role?.name;
 
                 if (pathname.startsWith('/system') && role !== 'system_administrator') {
                     router.push('/signin'); // Or redirect to their dashboard
@@ -47,8 +51,6 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
                     return;
                 }
             }
-
-
 
             setIsLoading(false);
         };
