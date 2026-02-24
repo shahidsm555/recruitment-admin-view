@@ -49,7 +49,7 @@ interface AuthState {
 }
 
 interface StoreState extends AuthState {
-  setAuth: (data: { user: User; access_control: AccessControl; auth: { access_token: string } }) => void;
+  setAuth: (data: { user: User; access_control: AccessControl; access_token: string }) => void;
   clearAuth: () => void;
   setUser: (user: User) => void;
   setAuthLoading: (loading: boolean) => void;
@@ -86,18 +86,18 @@ export const useStore = create<StoreState>()(
           console.error('Invalid auth data structure:', data);
           return;
         }
-        // localStorage.setItem('access_token', data.auth.access_token);
+        localStorage.setItem('access_token', data.access_token);
         set({
           user: data.user,
           accessControl: data.access_control || null,
           isAuthenticated: true,
           userRole: data.user.role?.name || 'USER',
-          accessToken: data.auth?.access_token || null,
+          accessToken: data.access_token || null,
         });
       },
 
       clearAuth: () => {
-        // We rely on cookies now, so we don't need to manually clear localStorage for the token
+        localStorage.removeItem('access_token');
         set({
           user: null,
           accessControl: null,
@@ -140,7 +140,8 @@ export const useStore = create<StoreState>()(
       fetchCurrentUser: async () => {
         set({ authLoading: true, authError: null });
         try {
-          const data = await apiRequest('auth/me');
+          const res = await apiRequest('auth/me');
+          const data = res?.user
           // Try to get role name from data.role object if it exists
           let roleName = data.role?.name;
 

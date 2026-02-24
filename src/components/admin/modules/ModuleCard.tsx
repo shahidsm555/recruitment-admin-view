@@ -1,8 +1,6 @@
 "use client";
 
-import dynamic from "next/dynamic";
 import { DynamicIcon } from "lucide-react/dynamic";
-import { Edit, Eye, Trash2 } from "lucide-react"; // ← important import
 
 interface Module {
     module_id: string;
@@ -40,7 +38,7 @@ const ModuleCard: React.FC<ModuleCardProps> = ({
                     }}
                     className="rounded-lg bg-white p-1.5 text-gray-500 shadow-theme-xs ring-1 ring-inset ring-gray-200 hover:text-brand-500 dark:bg-gray-800 dark:text-gray-400 dark:ring-gray-700 dark:hover:text-brand-400"
                 >
-                    <Edit className="h-4 w-4" />
+                    <DynamicIcon name="edit" className="h-4 w-4" />
                 </button>
                 <button
                     onClick={(e) => {
@@ -50,7 +48,7 @@ const ModuleCard: React.FC<ModuleCardProps> = ({
                     }}
                     className="rounded-lg bg-white p-1.5 text-gray-500 shadow-theme-xs ring-1 ring-inset ring-gray-200 hover:text-error-500 dark:bg-gray-800 dark:text-gray-400 dark:ring-gray-700 dark:hover:text-error-400"
                 >
-                    <Trash2 className="h-4 w-4" />
+                    <DynamicIcon name="trash-2" className="h-4 w-4" />
                 </button>
             </div>
 
