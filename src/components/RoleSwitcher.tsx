@@ -9,7 +9,7 @@ export default function RoleSwitcher() {
     const router = useRouter();
 
     const handleRoleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        const newRole = e.target.value as UserRole;
+        const newRole = e.target.value;
         setUserRole(newRole);
 
         // Redirect based on role

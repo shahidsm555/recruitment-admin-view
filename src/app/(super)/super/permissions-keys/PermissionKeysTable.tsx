@@ -1,26 +1,26 @@
 "use client";
 import React, { useState } from "react";
-import { Permission, usePermissionStore } from "@/store/usePermissionStore";
-import { getPermissionColumns } from "./columns";
-import ReusableTable, { TableColumn } from "@/components/ui/table/ReusableTable";
-import PermissionFormModal from "./PermissionFormModal";
-import Modal from "@/components/ui/modal/Modal";
+import { PermissionKey, usePermissionKeyStore } from "@/store/usePermissionKeyStore";
 import Button from "@/components/ui/button/Button";
+import { getPermissionKeyColumns } from "./columns";
+import PermissionKeyFormModal from "./PermissionKeyFormModal";
+import Modal from "@/components/ui/modal/Modal";
+import ReusableTable, { TableColumn } from "@/components/ui/table/ReusableTable";
 
-interface PermissionsTableProps {
-    permissions: Permission[];
+interface PermissionKeysTableProps {
+    permissionKeys: PermissionKey[];
 }
 
-export default function PermissionsTable({ permissions }: PermissionsTableProps) {
-    const { deletePermission } = usePermissionStore();
+export default function PermissionKeysTable({ permissionKeys }: PermissionKeysTableProps) {
+    const { deletePermissionKey } = usePermissionKeyStore();
 
     // Form Modal State
     const [isFormModalOpen, setIsFormModalOpen] = useState(false);
-    const [editItem, setEditItem] = useState<Permission | null>(null);
+    const [editItem, setEditItem] = useState<PermissionKey | null>(null);
 
     // Delete Modal State
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-    const [deletingItem, setDeletingItem] = useState<Permission | null>(null);
+    const [deletingItem, setDeletingItem] = useState<PermissionKey | null>(null);
     const [isDeleting, setIsDeleting] = useState(false);
 
     const handleCreateClick = () => {
@@ -28,12 +28,12 @@ export default function PermissionsTable({ permissions }: PermissionsTableProps)
         setIsFormModalOpen(true);
     };
 
-    const handleEditClick = (item: Permission) => {
+    const handleEditClick = (item: PermissionKey) => {
         setEditItem(item);
         setIsFormModalOpen(true);
     };
 
-    const handleDeleteClick = (item: Permission) => {
+    const handleDeleteClick = (item: PermissionKey) => {
         setDeletingItem(item);
         setIsDeleteModalOpen(true);
     };
@@ -42,7 +42,7 @@ export default function PermissionsTable({ permissions }: PermissionsTableProps)
         if (!deletingItem) return;
         setIsDeleting(true);
         try {
-            await deletePermission(deletingItem.permission_id);
+            await deletePermissionKey(deletingItem.permission_key_id);
             setIsDeleteModalOpen(false);
         } catch (error) {
             console.error(error);
@@ -52,36 +52,35 @@ export default function PermissionsTable({ permissions }: PermissionsTableProps)
         }
     };
 
-    const columns: TableColumn<Permission>[] = getPermissionColumns({
+    const columns: TableColumn<PermissionKey>[] = getPermissionKeyColumns({
         onEdit: handleEditClick,
         onDelete: handleDeleteClick,
     });
 
-    const handleSearchFilter = (item: Permission, searchTerm: string) => {
+    const handleSearchFilter = (item: PermissionKey, searchTerm: string) => {
         return (
-            item.display_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            item.permission_key.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            item.module_name.toLowerCase().includes(searchTerm.toLowerCase())
+            item.key_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            item.description.toLowerCase().includes(searchTerm.toLowerCase())
         );
     };
 
     return (
         <div className="space-y-4">
-            <ReusableTable<Permission>
-                data={permissions}
+            <ReusableTable<PermissionKey>
+                data={permissionKeys}
                 columns={columns}
-                rowKey={(item) => item.permission_id}
+                rowKey={(item) => item.permission_key_id}
                 searchable={true}
-                searchPlaceholder="Search permissions..."
+                searchPlaceholder="Search permission keys..."
                 searchFilterFn={handleSearchFilter}
-                createBtnText="Create Permission"
+                createBtnText="Create Permission Key"
                 onCreateClick={handleCreateClick}
                 defaultSortKey="created_at"
                 defaultSortDirection="desc"
-                emptyMessage="No permissions found."
+                emptyMessage="No permission keys found."
             />
 
-            <PermissionFormModal
+            <PermissionKeyFormModal
                 isOpen={isFormModalOpen}
                 onClose={() => setIsFormModalOpen(false)}
                 editItem={editItem}
@@ -94,7 +93,7 @@ export default function PermissionsTable({ permissions }: PermissionsTableProps)
             >
                 <div>
                     <p className="text-gray-600 dark:text-gray-300">
-                        Are you sure you want to delete the permission <strong>{deletingItem?.display_name}</strong>? This action cannot be undone.
+                        Are you sure you want to delete the permission key <strong>{deletingItem?.key_name}</strong>? This action cannot be undone.
                     </p>
                     <div className="mt-6 flex justify-end gap-3">
                         <Button variant="outline" onClick={() => setIsDeleteModalOpen(false)} disabled={isDeleting}>

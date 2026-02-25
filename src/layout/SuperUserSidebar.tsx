@@ -58,8 +58,11 @@ const sections: NavSection[] = [
                     { name: "Assign Access", path: "/super/users?action=assign" },
                     { name: "Role Assignment", path: "/super/users?action=roles" },
                     { name: "Org Access Control", path: "/super/users?action=org-access" },
+                    { name: "Roles", path: "/super/roles" },
                     { name: "Modules", path: "/super/modules" },
+                    { name: "Permissions Keys", path: "/super/permissions-keys" },
                     { name: "Permissions", path: "/super/permissions" },
+                    { name: "Assign Permissions", path: "/super/assign-permissions" },
                 ]
             },
             {

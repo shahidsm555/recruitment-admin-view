@@ -1,26 +1,26 @@
 "use client";
 import React, { useState } from "react";
-import { Permission, usePermissionStore } from "@/store/usePermissionStore";
-import { getPermissionColumns } from "./columns";
+import { Role, useRoleStore } from "@/store/useRoleStore";
+import { getRoleColumns } from "./columns";
 import ReusableTable, { TableColumn } from "@/components/ui/table/ReusableTable";
-import PermissionFormModal from "./PermissionFormModal";
+import RoleFormModal from "./RoleFormModal";
 import Modal from "@/components/ui/modal/Modal";
 import Button from "@/components/ui/button/Button";
 
-interface PermissionsTableProps {
-    permissions: Permission[];
+interface RolesTableProps {
+    roles: Role[];
 }
 
-export default function PermissionsTable({ permissions }: PermissionsTableProps) {
-    const { deletePermission } = usePermissionStore();
+export default function RolesTable({ roles }: RolesTableProps) {
+    const { deleteRole } = useRoleStore();
 
     // Form Modal State
     const [isFormModalOpen, setIsFormModalOpen] = useState(false);
-    const [editItem, setEditItem] = useState<Permission | null>(null);
+    const [editItem, setEditItem] = useState<Role | null>(null);
 
     // Delete Modal State
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-    const [deletingItem, setDeletingItem] = useState<Permission | null>(null);
+    const [deletingItem, setDeletingItem] = useState<Role | null>(null);
     const [isDeleting, setIsDeleting] = useState(false);
 
     const handleCreateClick = () => {
@@ -28,12 +28,12 @@ export default function PermissionsTable({ permissions }: PermissionsTableProps)
         setIsFormModalOpen(true);
     };
 
-    const handleEditClick = (item: Permission) => {
+    const handleEditClick = (item: Role) => {
         setEditItem(item);
         setIsFormModalOpen(true);
     };
 
-    const handleDeleteClick = (item: Permission) => {
+    const handleDeleteClick = (item: Role) => {
         setDeletingItem(item);
         setIsDeleteModalOpen(true);
     };
@@ -42,7 +42,7 @@ export default function PermissionsTable({ permissions }: PermissionsTableProps)
         if (!deletingItem) return;
         setIsDeleting(true);
         try {
-            await deletePermission(deletingItem.permission_id);
+            await deleteRole(deletingItem.role_id);
             setIsDeleteModalOpen(false);
         } catch (error) {
             console.error(error);
@@ -52,36 +52,38 @@ export default function PermissionsTable({ permissions }: PermissionsTableProps)
         }
     };
 
-    const columns: TableColumn<Permission>[] = getPermissionColumns({
+    const columns: TableColumn<Role>[] = getRoleColumns({
         onEdit: handleEditClick,
         onDelete: handleDeleteClick,
     });
 
-    const handleSearchFilter = (item: Permission, searchTerm: string) => {
+    const handleSearchFilter = (item: Role, searchTerm: string) => {
         return (
-            item.display_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            item.permission_key.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            item.module_name.toLowerCase().includes(searchTerm.toLowerCase())
+            item.role_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            item.description.toLowerCase().includes(searchTerm.toLowerCase())
         );
     };
 
+    // Filter out deleted roles locally just in case the API returned them
+    const activeRoles = roles.filter(role => !role.is_deleted);
+
     return (
         <div className="space-y-4">
-            <ReusableTable<Permission>
-                data={permissions}
+            <ReusableTable<Role>
+                data={activeRoles}
                 columns={columns}
-                rowKey={(item) => item.permission_id}
+                rowKey={(item) => item.role_id}
                 searchable={true}
-                searchPlaceholder="Search permissions..."
+                searchPlaceholder="Search roles..."
                 searchFilterFn={handleSearchFilter}
-                createBtnText="Create Permission"
+                createBtnText="Create Role"
                 onCreateClick={handleCreateClick}
                 defaultSortKey="created_at"
                 defaultSortDirection="desc"
-                emptyMessage="No permissions found."
+                emptyMessage="No roles found."
             />
 
-            <PermissionFormModal
+            <RoleFormModal
                 isOpen={isFormModalOpen}
                 onClose={() => setIsFormModalOpen(false)}
                 editItem={editItem}
@@ -94,7 +96,7 @@ export default function PermissionsTable({ permissions }: PermissionsTableProps)
             >
                 <div>
                     <p className="text-gray-600 dark:text-gray-300">
-                        Are you sure you want to delete the permission <strong>{deletingItem?.display_name}</strong>? This action cannot be undone.
+                        Are you sure you want to delete the role <strong>{deletingItem?.role_name}</strong>? This action cannot be undone.
                     </p>
                     <div className="mt-6 flex justify-end gap-3">
                         <Button variant="outline" onClick={() => setIsDeleteModalOpen(false)} disabled={isDeleting}>

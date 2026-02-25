@@ -1,7 +1,7 @@
 import React, { ReactNode } from "react";
 
 interface ButtonProps {
-  children: ReactNode; // Button text or content
+  children?: ReactNode; // Button text or content
   size?: "sm" | "md"; // Button size
   variant?: "primary" | "outline"; // Button variant
   startIcon?: ReactNode; // Icon before the text
@@ -10,6 +10,7 @@ interface ButtonProps {
   disabled?: boolean; // Disabled state
   className?: string; // Disabled state
   type?: "button" | "submit" | "reset";
+  iconOnly?: boolean; // If true, only an icon is displayed without regular padding/background
 }
 
 const Button: React.FC<ButtonProps> = ({
@@ -22,6 +23,7 @@ const Button: React.FC<ButtonProps> = ({
   className = "",
   disabled = false,
   type = "button",
+  iconOnly = false,
 }) => {
   // Size Classes
   const sizeClasses = {
@@ -40,8 +42,7 @@ const Button: React.FC<ButtonProps> = ({
   return (
     <button
       type={type}
-      className={`inline-flex items-center justify-center font-medium gap-2 rounded-lg transition ${className} ${sizeClasses[size]
-        } ${variantClasses[variant]} ${disabled ? "cursor-not-allowed opacity-50" : ""
+      className={`inline-flex items-center justify-center font-medium gap-2 rounded-lg transition ${className} ${iconOnly ? "p-1.5 bg-transparent text-gray-500 hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-200 disabled:opacity-50 disabled:bg-transparent" : `${sizeClasses[size]} ${variantClasses[variant]}`} ${disabled && !iconOnly ? "cursor-not-allowed opacity-50" : disabled && iconOnly ? "cursor-not-allowed" : ""
         }`}
       onClick={onClick}
       disabled={disabled}

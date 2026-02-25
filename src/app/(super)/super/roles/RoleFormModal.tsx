@@ -1,0 +1,110 @@
+"use client";
+import React, { useState, useEffect } from "react";
+import Modal from "@/components/ui/modal/Modal";
+import Input from "@/components/form/input/InputField";
+import Button from "@/components/ui/button/Button";
+import { Role, useRoleStore } from "@/store/useRoleStore";
+
+interface RoleFormModalProps {
+    isOpen: boolean;
+    onClose: () => void;
+    editItem: Role | null;
+}
+
+export default function RoleFormModal({ isOpen, onClose, editItem }: RoleFormModalProps) {
+    const { createRole, updateRole } = useRoleStore();
+
+    const [formData, setFormData] = useState({
+        role_name: "",
+        description: "",
+    });
+
+    const [submitting, setSubmitting] = useState(false);
+    const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
+    useEffect(() => {
+        if (editItem) {
+            setFormData({
+                role_name: editItem.role_name,
+                description: editItem.description,
+            });
+        } else {
+            setFormData({
+                role_name: "",
+                description: "",
+            });
+        }
+        setErrorMsg(null);
+    }, [editItem, isOpen]);
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({
+            ...prev,
+            [name]: value
+        }));
+    };
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setSubmitting(true);
+        setErrorMsg(null);
+        try {
+            if (editItem) {
+                await updateRole(editItem.role_id, formData);
+            } else {
+                await createRole(formData);
+            }
+            onClose();
+        } catch (error: any) {
+            setErrorMsg(error?.message || "Something went wrong.");
+        } finally {
+            setSubmitting(false);
+        }
+    };
+
+    return (
+        <Modal
+            isOpen={isOpen}
+            onClose={onClose}
+            title={editItem ? "Edit Role" : "Create Role"}
+        >
+            <form onSubmit={handleSubmit} className="space-y-4">
+                {errorMsg && (
+                    <div className="rounded-lg bg-error-50 p-3 text-sm text-error-600 dark:bg-error-500/10 dark:text-error-400">
+                        {errorMsg}
+                    </div>
+                )}
+
+                <div>
+                    <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">Role Name</label>
+                    <Input
+                        name="role_name"
+                        value={formData.role_name}
+                        onChange={handleChange}
+                        placeholder="e.g. system_administrator"
+                        required
+                    />
+                </div>
+
+                <div>
+                    <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">Description</label>
+                    <Input
+                        name="description"
+                        value={formData.description}
+                        onChange={handleChange}
+                        placeholder="Description of the role's purpose"
+                        required
+                    />
+                </div>
+
+                <div className="flex justify-end gap-3 pt-4 border-t border-gray-100 dark:border-white/5">
+                    <Button variant="outline" onClick={onClose} disabled={submitting}>Cancel</Button>
+                    <Button type="submit" disabled={submitting}>
+                        {submitting ? "Saving..." : "Save"}
+                    </Button>
+                </div>
+            </form>
+        </Modal>
+    );
+}

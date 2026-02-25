@@ -3,7 +3,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { apiRequest } from '@/lib/api';
 
-interface UserRole {
+export interface UserRole {
   role_id: string;
   name: string;
 }
@@ -52,6 +52,7 @@ interface StoreState extends AuthState {
   setAuth: (data: { user: User; access_control: AccessControl; access_token: string }) => void;
   clearAuth: () => void;
   setUser: (user: User) => void;
+  setUserRole: (role: string) => void;
   setAuthLoading: (loading: boolean) => void;
   setAuthError: (error: string | null) => void;
   login: (credentials: any) => Promise<void>;
@@ -108,6 +109,7 @@ export const useStore = create<StoreState>()(
       },
 
       setUser: (user) => set({ user, userRole: user.role.name, isAuthenticated: true }),
+      setUserRole: (role) => set({ userRole: role }),
 
       setAuthLoading: (loading) => set({ authLoading: loading }),
       setAuthError: (error) => set({ authError: error }),

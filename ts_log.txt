@@ -1,0 +1,4 @@
+src/app/(super)/super/permissions-keys/PermissionKeysTable.tsx(197,119): error TS2322: Type '{ children: string; className: string; colSpan: number; }' is not assignable to type 'IntrinsicAttributes & TableCellProps'.
+  Property 'colSpan' does not exist on type 'IntrinsicAttributes & TableCellProps'.
+src/components/RoleSwitcher.tsx(4,20): error TS2459: Module '"../store/useStore"' declares 'UserRole' locally, but it is not exported.
+src/components/RoleSwitcher.tsx(8,23): error TS2339: Property 'setUserRole' does not exist on type 'StoreState'.
